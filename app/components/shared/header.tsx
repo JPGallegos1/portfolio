@@ -1,43 +1,58 @@
-import { Search, User } from "lucide-react";
+import { Link } from "@remix-run/react";
+import {  User, Play } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Link, useLocation } from "@remix-run/react";
+import { useEffect, useState } from "react";
+import { Project } from "database.types";
+import { toKebabCase } from "~/lib/utils";
+import useSuggestions from "~/hooks/useSuggestions";
+import Navigation from "../navigation";
+import SuggestionsForm from "../form/suggestions";
 
-const navigation = [
-  { name: "All", href: "/" },
-  { name: "React", href: "/?category=react" },
-  { name: "AI", href: "/?category=ai" },
-  { name: "Data Visualization", href: "/?category=datavis" },
-];
+export default function Header({
+  initialProjects,
+}: {
+  initialProjects: Project[];
+}) {
+  const [scrollY, setScrollY] = useState(0);
+  const { query, setQuery, suggestions, setSuggestions, inputRef, handleInputChange } = useSuggestions(initialProjects);
 
-export default function Header() {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
 
-  const category = searchParams.get("category") || "all";
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const gradientOpacity = Math.min(scrollY / 200, 1);
 
   return (
     <div className="w-full">
-      <header>
-        <div className="container flex h-16 items-center gap-4 px-4 justify-center">
-          <div className="flex-1 flex items-center justify-center">
-            <form className="flex items-center gap-2 w-full justify-center">
-              <div className="relative flex-1 max-w-xl">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="What kind of project are you looking for?"
-                  className="pl-8 bg-muted/50 bg-white"
-                />
-              </div>
-            </form>
+      <header className="sticky top-0 z-50 bg-black text-brand-lightblue-100 shadow-md">
+        <div className="container flex h-16 items-center gap-4 px-4 justify-between">
+          {/* Left Section: Navigation Buttons + Search Bar */}
+          <div className="flex items-center gap-4 w-full">
+            <Navigation />
+
+            <SuggestionsForm
+              query={query}
+              setQuery={setQuery}
+              suggestions={suggestions}
+              setSuggestions={setSuggestions}
+              inputRef={inputRef}
+              handleInputChange={handleInputChange}
+            />
           </div>
+
+          {/* Right Section: User Dropdown */}
           <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -55,21 +70,42 @@ export default function Header() {
             </DropdownMenu>
           </div>
         </div>
-        <nav className="container px-4 pb-2">
-          <ul className="flex gap-4">
-            {navigation.map((item) => (
-              <li key={item.name}>
-                <Link
-                  to={item.href}
-                  className="text-sm font-medium hover:text-slate-400 transition-colors"
-                >
-                  {item.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+
+        {/* Gradient Overlay */}
+        {gradientOpacity >= 0.5 && (
+          <div
+            className={`bg-brand-greenblue-500 text-white py-2 px-4 transition-opacity duration-300 ${
+              gradientOpacity >= 0.5
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-5 pointer-events-none"
+            }`}
+          >
+            <Link
+              to={`/about`}
+              className="opacity-100 transition-opacity flex items-center gap-2 rounded-full px-4 py-2 text-white"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500">
+                <Play className="h-6 w-6 fill-black text-black" />
+              </div>
+              <span className="text-lg font-medium">
+                Browse my professional journey
+              </span>
+            </Link>
+          </div>
+        )}
       </header>
+
+      <div className="relative w-full h-[300px] overflow-hidden">
+        <img
+          src="jpgallegos-banner.png"
+          alt="Duki background"
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-black to-black z-10 transition-opacity duration-100"
+          style={{ opacity: gradientOpacity }}
+        ></div>
+      </div>
     </div>
   );
 }

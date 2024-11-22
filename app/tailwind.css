@@ -75,3 +75,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.aquamarine-gradient {
+  background: linear-gradient(to bottom, #0c7484, #041b2f);
+}
