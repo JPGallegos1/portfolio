@@ -1,9 +1,9 @@
-import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import type { Route } from "./+types/home";
+import type { MetaFunction } from "react-router";
 import "~/tailwind.css"
 import Header from "~/components/shared/header";
 import Overview from "~/components/overview";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, data } from "react-router";
 import { supabaseServerInstance } from "~/lib/utils.server";
 import { type Project } from "database.types";
 
@@ -14,7 +14,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export async function loader ({request}: Route.LoaderArgs) {
 
   const { supabase, headers } = supabaseServerInstance(request);
 
@@ -27,14 +27,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     throw new Response("Error loading data", { status: 500 });
   }
 
-  return json({ initialProjects }, { headers });
-};
-
+  return data({initialProjects}, { headers });
+}
 
 export default function Index() {
-  const { initialProjects} = useLoaderData< { initialProjects: Project[] }>();
-
-  console.log({ initialProjects });
+  const { initialProjects } = useLoaderData<{ initialProjects: Project[] }>();
 
   return (
     <div className="min-h-screen w-full text-white">

@@ -12,7 +12,7 @@ import {
   Stethoscope,
   Gamepad,
 } from "lucide-react";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import useHoveredById from "~/hooks/useHoveredById";
 
 type Props = {

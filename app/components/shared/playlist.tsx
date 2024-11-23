@@ -12,7 +12,7 @@ type Props = {
 export default function Playlist({
   initialProjects,
 }: Props) {
-  const originalCount = initialProjects.length;
+  const originalCount = initialProjects?.length;
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [offset, setOffset] = useState(originalCount);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +36,7 @@ export default function Playlist({
         ...formatProjects(newProjects),
       ]);
       setOffset(
-        (prevOffset) => prevOffset + formatProjects(newProjects).length
+        (prevOffset) => prevOffset + formatProjects(newProjects)?.length
       );
     }
 
@@ -52,18 +52,18 @@ export default function Playlist({
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Projects</h2>
       <div className="space-y-4">
-        {projects.map((project) => (
+        {projects?.map((project) => (
           <PlaylistItem key={project.id} project={project} />
         ))}
       </div>
       <Button
         variant="link"
         className="text-white/60 hover:text-white"
-        onClick={projects.length > originalCount ? seeLess : fetchMoreProjects}
+        onClick={projects?.length > originalCount ? seeLess : fetchMoreProjects}
       >
         {isLoading
           ? "Loading..."
-          : projects.length > originalCount
+          : projects?.length > originalCount
           ? "See less"
           : "See more"}
       </Button>

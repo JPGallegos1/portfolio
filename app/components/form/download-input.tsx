@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { Card, CardContent } from "../ui/card";
 import { Download } from "lucide-react";
 import Typography from "../ui/typography";
